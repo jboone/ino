@@ -16,11 +16,12 @@
 {% for source, target in cpp.items() %}
 {{ target.path }} : {{ source.path }}
 	@mkdir -p {{ target.path|dirname }}
-	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ iquote(source) }} -MM $^ > $@
 	{# prepend build path to a target in the generated file and 
 	   add .d file itself as a target so that changes in a header file would rebuild dependency files
 	   See: http://make.paulandlesley.org/autodep.html #}
-	@echo -n "{{ target.path }} {{ target.path|dirname }}{{ slash }}" | cat - $@ > $@~ && mv $@~ $@
+	@echo -n "{{ target.path }} {{ target.path|dirname }}{{ slash }}" > $@~
+	{{v}}{{ e.cc }} {{ e.cflags }} {{ inc_flags }} {{ iquote(source) }} -MM $^ > $@~
+	@mv $@~ $@
 {% endfor %}
 
 {#
